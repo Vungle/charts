@@ -15,7 +15,16 @@ resources: {}
   #   memory: 1024Mi
 Storage: "1Gi"
 DataDirectory: "/opt/kafka/data"
-
+Affinity:
+  NodeAffinity:
+    Key: cloud.google.com/gke-nodepool
+    Values:
+      - kafka
+      - betterkafka
+  PodAntiAffinity:
+    Enabled: true
+Tolerations:
+  dedicated: kafka
 #------------------------------------------------------------------------------
 # Zookeeper:
 #------------------------------------------------------------------------------

@@ -16,6 +16,47 @@ spec:
         app: {{ include "kafka.name" . | quote }}
         release: {{ .Release.Name | quote }}
     spec:
+      {{ if .Values.Affinity -}}
+      affinity:
+      {{- if .Values.Affinity.NodeAffinity }}
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ .Values.Affinity.NodeAffinity.Key }}
+                operator: In
+                values:
+{{ toYaml .Values.Affinity.NodeAffinity.Values | indent 16 }}
+      {{- end -}}
+      {{- if .Values.Affinity.PodAntiAffinity }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: {{ .Values.Affinity.PodAntiAffinity.Key | default "app" }}
+                operator: In
+                values:
+                  {{- if .Values.Affinity.PodAntiAffinity.Values }}
+{{ toYaml .Values.Affinity.NodeAffinity.Values | indent 16 }}
+                  {{- else }}
+                  - {{ include "kafka.name" . | quote }}
+                  {{- end }}
+            topologyKey: kubernetes.io/hostname
+      {{- end }}
+      {{- end }}
+      {{ if .Values.Tolerations -}}
+        tolerations:
+          {{- range $key, $val := .Values.Tolerations }}
+          - key: {{ $key }}
+            {{ if $val -}}
+            operator: "Equal"
+            value: {{ $val |quote}}
+            {{- else -}}
+            operator: "Exists"
+            {{- end }}
+            effect: "NoSchedule"
+          {{- end }}
+      {{- end }}
       containers:
       - name: {{ template "kafka.name" . }}-broker
         image: "{{ .Values.Image }}:{{ .Values.ImageTag }}"
