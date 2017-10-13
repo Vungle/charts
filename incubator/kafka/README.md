@@ -61,6 +61,8 @@ following configurable parameters:
 | `resources`             | Kafka resource requests and limits | `{}`                                                       |
 | `DataDirectory`         | Kafka data directory               | `/opt/kafka/data`                                          |
 | `Storage`               | Kafka Persistent volume size       | `1Gi`                                                      |
+| `StorageClasss`         | Kafka Persistent volume class      | `anything`                                                 |
+| `Affinity`              | Node affinity and pod antiaffinity | `(unset)`                                                  |
 
 Specify parameters using `--set key=value[,key=value]` argument to `helm install`
 
