@@ -32,5 +32,7 @@ spec:
   selector:
     app: {{ include "kafka.name" . | quote }}
     release: {{ .Release.Name | quote }}
+  {{- if .Values.loadBalancerSourceRangesEnabled }}
   loadBalancerSourceRanges:
 {{ toYaml .Values.loadBalancerSourceRanges | indent 2 }}
+  {{- end -}}
