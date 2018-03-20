@@ -82,12 +82,14 @@ spec:
         ports:
         - containerPort: 9092
           name: kafka
+        - containerPort: 9093
+          hostPort: 9093
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         command:
         - sh
         - -c
-        - "./bin/kafka-server-start.sh config/server.properties --override zookeeper.connect={{ .Release.Name }}-zookeeper:2181/ --override log.dirs={{ printf "%s/logs" .Values.DataDirectory }} --override broker.id=${HOSTNAME##*-}"
+        - "apt-get update;apt-get install -y wget;./bin/kafka-server-start.sh config/server.properties --override zookeeper.connect={{ .Release.Name }}-zookeeper:2181/ --override log.dirs={{ printf "%s/logs" .Values.DataDirectory }} --override broker.id=${HOSTNAME##*-} --override listener.security.protocol.map=INTERNAL_PLAINTEXT:PLAINTEXT,EXTERNAL_PLAINTEXT:PLAINTEXT --override advertised.listeners=\"INTERNAL_PLAINTEXT://${HOSTNAME}.kafka-kafka-headless.kafka.svc.cluster.local:9092,EXTERNAL_PLAINTEXT://$(eval wget --header 'X-Google-Metadata-Request: True' -t3 -T2 -qO- 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip'):9093\" --override listeners=INTERNAL_PLAINTEXT://0.0.0.0:9092,EXTERNAL_PLAINTEXT://0.0.0.0:9093 --override inter.broker.listener.name=INTERNAL_PLAINTEXT"
         volumeMounts:
         - name: datadir
           mountPath: "{{ .Values.DataDirectory }}"

@@ -26,6 +26,7 @@ DataDirectory: "/opt/kafka/data"
 # Tolerations:
   # dedicated: kafka
   # secretnode:
+loadBalancerSourceRanges: {}
 #------------------------------------------------------------------------------
 # Zookeeper:
 #------------------------------------------------------------------------------
